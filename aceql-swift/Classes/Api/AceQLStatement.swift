@@ -2,8 +2,8 @@
 //  AceQLStatement.swift
 //  AceQL.Client
 //
-//  Created by Bruno Paul on 14.12.17.
-//  Copyright © 2017 X. All rights reserved.
+//  Created by KawanSoft / Bruno Paul on 11/12/17.
+//  Copyright © 2017 KawanSoft. All rights reserved.
 //
 
 import Foundation
