@@ -25,4 +25,4 @@ Bruno Paul, brunopaul88@outlook.com
 
 ## License
 
-aceql-swift is available under the MIT license. See the LICENSE file for more info.
+aceql-swift is available under the Apache License 2.0. See the LICENSE file for more info.
