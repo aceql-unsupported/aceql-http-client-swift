@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum AceQLNullType: Int {
+public enum AceQLNullType: Int {
     /// <summary>
     /// SQL type BIT.
     /// </summary>
