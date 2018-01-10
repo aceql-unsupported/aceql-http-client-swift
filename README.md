@@ -22,7 +22,7 @@ pod 'aceql-swift'
 
 ## Author
 
-Marko, marko@marko.com
+Bruno Paul, brunopaul88@outlook.com
 
 ## License
 
