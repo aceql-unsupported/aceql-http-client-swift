@@ -1,6 +1,7 @@
 # aceql-swift
 
 [![Version](https://img.shields.io/cocoapods/v/aceql-swift.svg?style=flat)](http://cocoapods.org/pods/aceql-swift)
+[![License](https://img.shields.io/cocoapods/l/aceql-swift.svg?style=flat)](http://cocoapods.org/pods/aceql-swift)
 [![Platform](https://img.shields.io/cocoapods/p/aceql-swift.svg?style=flat)](http://cocoapods.org/pods/aceql-swift)
 
 ## Example
