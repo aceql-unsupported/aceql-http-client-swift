@@ -10,6 +10,6 @@ import Foundation
 
 class VersionValues {
     static let PRODUCT: String = "AceQL HTTP Client SDK"
-    static let VERSION: String = "v1.0.10-beta"
-    static let DATE: String = "12-jul-2017"
+    static let VERSION: String = "v1.0-beta"
+    static let DATE: String = "12-jan-2018"
 }
