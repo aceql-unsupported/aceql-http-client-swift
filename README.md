@@ -132,7 +132,7 @@ let password = "password";
 
 AceQLConnection.setTraceOn(traceOn: true)
         
-connection = AceQLConnection(server: serverUrl, database: database, 	                 		username: username, password: password)
+connection = AceQLConnection(server: serverUrl, database: database, username: username, password: password)
 
 // Establish the connection with the remote server
 connection.openAsync() { status in }
@@ -347,9 +347,6 @@ self.connection.run(sql: sql) { stmt in
 ```
 
 ------
-
-
-
 
 
 
