@@ -129,8 +129,6 @@ let serverUrl = "https://www.acme.com:9443/aceql";
 let database = "kawansoft_example";
 let username = "username";
 let password = "password";
-
-AceQLConnection.setTraceOn(traceOn: true)
         
 connection = AceQLConnection(server: serverUrl, database: database, username: username, password: password)
 
