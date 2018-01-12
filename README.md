@@ -67,9 +67,10 @@ HTTP requests parameters are transported in UTF-8 format and JSON format is used
 
 All requests are streamed:
 
-Output requests (from the client side)  are streamed directly from the socket to the server to avoid buffering any content body
+- Output requests (from the client side)  are streamed directly from the socket to the server to avoid buffering any content body
 
-Input responses (for the client side)   are streamed directly from the socket to the server to efficiently read the response body.
+- Input responses (for the client side)   are streamed directly from the socket to the server to efficiently read the response body.
+
 
 *Note that in this version SELECT result sets are stored in memory and not streamed.*
 
