@@ -1,0 +1,26 @@
+                   Swift Client SDK
+                     Version 1.0
+                    Release Notes
+
+
+Introduction
+------------
+
+The Swift Python Client SDK allows to wrap the AceQL HTTP APIs and 
+eliminate the tedious works of handling communications errors and 
+parsing JSON results.
+
+macOS and iOS application developers can access 
+remote SQL databases and/or SQL databases in the cloud by simply 
+including standard JDBC calls in their code, just like 
+they would for a local database.
+
+The AceQL Swift Client SDK is licensed under the Apache 2.0
+License.
+.
+
+AceQL Swift Client SDK - Version 1.0 - 12-jan-2018
+--------------------------------------------------
+
+What's New:
+- First public release.
