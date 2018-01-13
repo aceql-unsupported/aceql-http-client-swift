@@ -257,9 +257,9 @@ If `errortype` is > 0, the HTTP Status Code can take one the following values re
 
 `NULL` values are handled in a specific way, because the remote server must know the type of the `NULL` value.
 
-Use the `AceQLNullType` enum to pass a NULL value. Choose the `SqlNullType`  constant that defines the type of the parameter. 
+Use the `AceQLNullType` enum to pass a NULL value. Choose the `SqlNullType`  constant that defines the type of the parameter on the SQL side.
 
-Example for a String value:
+Example for a String/VARCHAR value:
 
 ```swift
 let sql = "insert into customer values " 
