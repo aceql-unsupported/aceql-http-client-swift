@@ -292,23 +292,23 @@ The Swift SDK module supports BLOB creation and reading.  CLOBs are not supporte
 
 ```swift
 let sql = "insert into orderlog values (@param1, @param2, @param3, @param4, "
-	+ "@param5, @param6, @param7, @param8, @param9)";
+    + "@param5, @param6, @param7, @param8, @param9)";
 
 let stmt = self.connection.prepare(sql: sql)
 let image = UIImage(named: "tx01_366")
 let customer_id = 0
 
 stmt?.run(args: customer_id, customer_id,
-		  "Description_" + String(customer_id),
-		  AceQLNullType.DECIMAL, Date(), Date(),
-		  UIImageJPEGRepresentation(image!, 1.0), 1, 2000 )
+          "Description_" + String(customer_id),
+          AceQLNullType.DECIMAL, Date(), Date(),
+          UIImageJPEGRepresentation(image!, 1.0), 1, 2000 )
 { result, status in
-	if (status)
-	{
-		self.UI() {
-			self.showAlert(message: "Success - Blob Insert")
-		}
-	}
+    if (status)
+    {
+        self.UI() {
+            self.showAlert(message: "Success - Blob Insert")
+        }
+    }
 }
 ```
 
@@ -321,27 +321,27 @@ let sql = "select * from orderlog where customer_id = 1"
 var blobId: String?
 
 self.connection.run(sql: sql) { stmt in
-	for row in stmt
-	{
-		for column in row
-		{
-			print("column : \(column)")
-		}
-		
-		blobId = row[3] as? String
-	}
-	
-	if (blobId != nil)
-	{
-		self.connection.downloadBlob(blobId: blobId) { data in
-			if (data != nil) {
-				self.UI() {
-					self.blobImageView.image = UIImage(data: data!)
-					self.showAlert(message: "Success - Blob Select")
-				}
-			}
-		}
-	}
+    for row in stmt
+    {
+        for column in row
+        {
+            print("column : \(column)")
+        }
+        
+        blobId = row[3] as? String
+    }
+    
+    if (blobId != nil)
+    {
+        self.connection.downloadBlob(blobId: blobId) { data in
+            if (data != nil) {
+                self.UI() {
+                    self.blobImageView.image = UIImage(data: data!)
+                    self.showAlert(message: "Success - Blob Select")
+                }
+            }
+        }
+    }
 }
 ```
 
