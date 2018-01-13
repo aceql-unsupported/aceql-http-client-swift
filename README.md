@@ -309,7 +309,7 @@ stmt?.run(args: customer_id, customer_id,
                 self.showAlert(message: "Success - Blob Insert")
             }
         }
-	}
+    }
 ```
 
 ### BLOB reading example
