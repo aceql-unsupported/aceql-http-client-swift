@@ -143,11 +143,11 @@ Following sample shows how to insert a new customers using a  prepared statement
 
 ```swift
 let sql = "insert into customer values " 
-          + "(@param1, @param2, @param3, @param4, @param5, @param6, @param7, @param8)"
+	+ "(@param1, @param2, @param3, @param4, @param5, @param6, @param7, @param8)"
 
 let stmt = connection.prepare(sql: sql)
 stmt?.run(args: 1, "Sir", "John", "Smith I", "1 Madison Ave", 
-          "New York", "NY 10010", "+1 212-586-7001") { result, status in }
+	"New York", "NY 10010", "+1 212-586-7001") { result, status in }
 ```
 
 We view the first inserted customer:
@@ -263,13 +263,13 @@ Example for a String value:
 
 ```swift
 let sql = "insert into customer values " 
-          + (@param1, @param2, @param3, @param4, @param5, @param6, @param7, @param8)"
+	 + (@param1, @param2, @param3, @param4, @param5, @param6, @param7, @param8)"
 
 let stmt = connection.prepare(sql: sql)
 
 // We don't know the phone number ==> set it to null
 stmt?.run(args: 1, "Sir", "John", "Smith I", "1 Madison Ave", 
-          "New York", "NY 10010", AceQLNullType.VARCHAR)) { result, status in }
+	"New York", "NY 10010", AceQLNullType.VARCHAR)) { result, status in }
 ```
 
 ## Transactions
@@ -299,16 +299,16 @@ let image = UIImage(named: "tx01_366")
 let customer_id = 0
 
 stmt?.run(args: customer_id, customer_id,
-          "Description_" + String(customer_id),
-          AceQLNullType.DECIMAL, Date(), Date(),
-          UIImageJPEGRepresentation(image!, 1.0), 1, 2000 )
-{ result, status in
-    if (status)
-    {
-        self.UI() {
-            self.showAlert(message: "Success - Blob Insert")
+	"Description_" + String(customer_id),
+     AceQLNullType.DECIMAL, Date(), Date(),
+     UIImageJPEGRepresentation(image!, 1.0), 1, 2000 )
+    { result, status in
+        if (status)
+        {
+            self.UI() {
+                self.showAlert(message: "Success - Blob Insert")
+            }
         }
-    }
 }
 ```
 
