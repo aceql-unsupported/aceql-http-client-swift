@@ -4,7 +4,7 @@
 
    * [Fundamentals](#fundamentals)
       * [Requirements](#requirements)
-      * [AceQL Server Side compatiblity](#aceql-server-side-compatiblity)
+      * [AceQL Server side compatiblity](#aceql-server-side-compatiblity)
       * [Installation](#installation)
       * [Samples](#samples)
       * [License](#license)
@@ -42,9 +42,9 @@ On the remote side, like the AceQL Server access to the SQL database using Java 
 - Xcode 8.3+
 - Swift 3.1+
 
-## AceQL Server Side compatiblity
+## AceQL Server side compatiblity
 
-This 1.0 SDK version is compatible with both AceQL HTTP server side v1.0 and AceQL HTTP server side v1.0 v2.0. 
+This 1.0 SDK version is compatible with both AceQL HTTP Server v1.0 and AceQL HTTP Server v2.0. 
 
 ## Installation
 
