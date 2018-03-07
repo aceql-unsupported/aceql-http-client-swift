@@ -44,7 +44,7 @@ On the remote side, like the AceQL Server access to the SQL database using Java 
 
 ## AceQL Server Side compatiblity
 
-This 1.0 SDK version is compatible both with AceQL HTTP server side v1.0 and  v2.0. 
+This 1.0 SDK version is compatible with both AceQL HTTP server side v1.0 and AceQL HTTP server side v1.0 v2.0. 
 
 ## Installation
 
