@@ -4,7 +4,7 @@
 
    * [Fundamentals](#fundamentals)
       * [Requirements](#requirements)
-      * [AceQL Server side compatiblity](#aceql-server-side-compatiblity)
+      * [AceQL Server Side compatiblity](#aceql-server-side-compatiblity)
       * [Installation](#installation)
       * [Samples](#samples)
       * [License](#license)
@@ -42,9 +42,9 @@ On the remote side, like the AceQL Server access to the SQL database using Java 
 - Xcode 8.3+
 - Swift 3.1+
 
-## AceQL Server side compatiblity
+## AceQL Server side compatibility
 
-This 1.0 SDK version is compatible with both AceQL HTTP Server v1.0 and AceQL HTTP Server v2.0. 
+This 1.0 SDK version is compatible with both AceQL HTTP server side v1.0 and AceQL HTTP server side v2.0. 
 
 ## Installation
 
@@ -106,23 +106,6 @@ The main server side JDBC data types for columns are supported:
 Note that the Swift SDK does not allow you to specify data types to use; data types are implicitly chosen by the module.
 
 Parameter values are automatically converted to their SQL equivalent. ate Management
-
-AceQL supports two state management modes:
-
-- The Stateful Mode
-- The Stateless Mode
-
- The Stateful Mode is the default when creating a session.
-
- State Management is described in detail in:
-
-[AceQL HTTP Server Installation and Configuration Guide](https://github.com/kawansoft/aceql-http/blob/master/aceql-http-1.0-user-guide-server.md).
-
-You can set the session State with the static method:
-
-`AceQLConnection.setStateless(Bool)`
-
-Note that transactions and Connection modifiers calls are not allowed in Stateless mode and will raise an Error exception.
 
 # Usage
 
@@ -221,21 +204,20 @@ The error type allows you to get the type of error, and where the error occurred
 ### Most common AceQL server messages
 
 | AceQL Sever  Error Messages   (AceQLException.ErrorType  = 2) |
-| ---------------------------------------- |
-| AceQL main  servlet not found in path    |
-| An error occurred  during Blob download  |
-| An error occurred  during Blob upload    |
+| ------------------------------------------------------------ |
+| AceQL main  servlet not found in path                        |
+| An error occurred  during Blob download                      |
+| An error occurred  during Blob upload                        |
 | Blob directory  defined in `DatabaseConfigurator.getBlobDirectory()` does not exist |
-| Connection is  invalidated (probably expired) |
-| Database does not  exist                 |
-| Invalid blob_id.  Cannot be used to create a file |
-| Invalid blob_id. No Blob corresponding to blob_id |
-| Invalid  session_id                      |
-| Invalid username  or password            |
-| No action found  in request              |
-| Operation not  allowed in stateless mode |
-| Unable to get a  Connection              |
-| Unknown SQL  action or not supported by software |
+| Connection is  invalidated (probably expired)                |
+| Database does not  exist                                     |
+| Invalid blob_id.  Cannot be used to create a file            |
+| Invalid blob_id. No Blob corresponding to blob_id            |
+| Invalid  session_id                                          |
+| Invalid username  or password                                |
+| No action found  in request                                  |
+| Unable to get a  Connection                                  |
+| Unknown SQL  action or not supported by software             |
 
 ### HTTP Status Codes
 
