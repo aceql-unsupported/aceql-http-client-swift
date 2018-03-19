@@ -54,6 +54,7 @@ public class AceQLStatement {
                 self.rollbackAsync()
             }
             
+            self.aceQLConnection.setRowsChanged(result: result.description)
             completion(result.description, status)
         }
     }

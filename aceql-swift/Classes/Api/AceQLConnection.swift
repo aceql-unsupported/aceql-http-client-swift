@@ -18,6 +18,13 @@ public class AceQLConnection {
     ///  Says if connection is closed
     /// </summary>
     var closeAsyncDone: Bool = false
+
+    /// <summary>
+    ///  Says if connection is logged out
+    /// </summary>
+    var logoutAsyncDone: Bool = false
+
+    var rowsChanged: Int = 0
     
     /// <summary>
     /// Initializes a new instance of the <see cref="AceQLConnection"/> class.
@@ -26,39 +33,26 @@ public class AceQLConnection {
     {
         aceQLHttpApi = AceQLHttpApi()
     }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AceQLConnection"/> class  when given a string that contains the connection string.
-    /// </summary>
-    /// <param name="connectionString">The connection used to open the remote database.</param>
-    /// <exception cref="System.ArgumentNullException">If connectionString is null.</exception>
-    public init (connectionString: String)
-    {
-        aceQLHttpApi = AceQLHttpApi(connectionString: connectionString)
-    }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AceQLConnection"/> class  when given a string that contains the connection string
-    /// and an <see cref="AceQLCredential"/> object that contains the username and password.
-    /// </summary>
-    /// <param name="connectionString">A connection string that does not use any of the following connection string keywords: Username
-    /// or Password.</param>
-    /// <param name="credential"><see cref="AceQLCredential"/> object. </param>
-    /// <exception cref="System.ArgumentNullException">If connectionString is null or <see cref="AceQLCredential"/> is null.</exception>
-    /// <exception cref="System.ArgumentException">connectionString token does not contain a = separator: " + line</exception>
-    public init(connectionString: String, credential: AceQLCredential)
-    {
-        aceQLHttpApi = AceQLHttpApi(connectionString: connectionString, credential: credential)
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AceQLConnection"/> class.
     /// </summary>
-    public init(server: String, database: String, username: String, password: String)
+    public init(server: String, database: String, username: String, password: String, isProxy: Bool)
     {
-        let connectionString = "Server=\(server); Database=\(database); "
+        var connectionString = "Server=\(server); Database=\(database); "
+        if (isProxy)
+        {
+            connectionString += "ProxyUri=\(server); "
+        }
+        
         let credential = AceQLCredential(username: username, password: password)
+
         aceQLHttpApi = AceQLHttpApi(connectionString: connectionString, credential: credential)
+    }
+    
+    public func setTimeout(timeout: Int)
+    {
+        aceQLHttpApi.timeout = timeout
     }
 
     /// <summary>
@@ -124,10 +118,28 @@ public class AceQLConnection {
             return;
         }
     
-        aceQLHttpApi.callApiNoResultAsync(commandName: "disconnect", commandOption: ""){status in}
+        aceQLHttpApi.callApiNoResultAsync(commandName: "close", commandOption: ""){status in}
         closeAsyncDone = true;
     }
     
+    /// <summary>
+    /// Closes the connection to the remote database and closes the http session.
+    /// This is the preferred method of closing any open connection.
+    /// </summary>
+    public func logoutAsync()
+    {
+        if (logoutAsyncDone)
+        {
+            return;
+        }
+        
+        let loginStore = UserLoginStore(serverUrl: aceQLHttpApi.server, username: aceQLHttpApi.userName, database: aceQLHttpApi.database)
+        loginStore.Remove()
+
+        aceQLHttpApi.callApiNoResultAsync(commandName: "logout", commandOption: ""){status in}
+        logoutAsyncDone = true;
+    }
+
     public func run(sql: String, completion: @escaping(String?, Bool) -> Void)
     {
         var command: AceQLCommand? = nil
@@ -168,6 +180,7 @@ public class AceQLConnection {
                         iRow = iRow + 1
                         data.append(rowData)
                     }
+                    self.rowsChanged = iRow
                 }
             }
             
@@ -185,6 +198,18 @@ public class AceQLConnection {
     {
         aceQLHttpApi.blobDownloadAsync(blobId: blobId!) { data in
             completion(data)
+        }
+    }
+    
+    public func setRowsChanged(result: String)
+    {
+        let rows: Int? = Int(result)
+        if (rows == nil)
+        {
+            rowsChanged = 0
+        }
+        else{
+            rowsChanged = rows!
         }
     }
     

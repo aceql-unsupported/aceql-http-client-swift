@@ -25,11 +25,6 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var database: String? = nil
     
     /// <summary>
-    /// Says if session is stateless. defaults to false.
-    /// </summary>
-    var stateless = false
-    
-    /// <summary>
     /// The Proxy Uri, if we don't want
     /// </summary>
     var proxyUri: String? = nil
@@ -37,7 +32,7 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// <summary>
     /// The timeout in milliseconds
     /// </summary>
-    var timeout: Int = 0;
+    var timeout: Int = 0
     
     /// <summary>
     /// The HTTP status code
@@ -45,7 +40,7 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var httpStatusCode: HTTPURLResponse?
     
     // Future usage
-    //int connectTimeout = 0;
+    //int connectTimeout = 0
     
     /// <summary>
     /// The pretty printing
@@ -89,7 +84,7 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// <exception cref="System.ArgumentException">connectionString token does not contain a = separator: " + line</exception>
     init(connectionString: String)
     {
-        self.connectionString = connectionString;
+        self.connectionString = connectionString
     }
     
     
@@ -99,6 +94,10 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         self.credential = credential
     }
     
+    func setTimeout(timeout: Int)
+    {
+        self.timeout = timeout
+    }
     
     /// <summary>
     /// Opens this instance.
@@ -120,49 +119,83 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
         if (server == nil)
         {
-//            throw AceQLException.missedServer
+            AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "MissedServer")
             completion(false)
-            return;
+            return
         }
         if (username == nil)
         {
-//            throw AceQLException.missedUsername
+            AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "MissedUserName")
             completion(false)
-            return;
+            return
         }
         if (password == nil)
         {
-//            throw AceQLException.missedPassword
+            AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "WrongPassword")
             completion(false)
-            return;
+            return
         }
         if (database == nil)
         {
-//            throw AceQLException.missedDatabase
+            AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "NoDatabase")
             completion(false)
-            return;
+            return
         }
     
-        theUrl = server! + "/database/" + database! + "/username/" + username!
-        theUrl = theUrl + "/connect" + "?password=" + password! + "&stateless=" + String(describing: stateless)
-        ConsoleEmul.WriteLine(log: "theUrl: " + theUrl)
-    
-        callWithGetAsync(url: theUrl) {result, status in
-            if result == nil {
-                completion(false)
-            } else {
-                let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status!)
-    //            if (!resultAnalyzer.isStatusOk()) {
-    //                throw new AceQLException(resultAnalyzer.GetErrorMessage(),
-    //                                         resultAnalyzer.GetErrorId(),
-    //                                         resultAnalyzer.GetStackTrace(),
-    //                                         httpStatusCode);
-    //            }
-                
-                let theSessionId = resultAnalyzer.getValue(name: "session_id");
-                self.url = self.server! + "/session/" + theSessionId! + "/";
-                AceQLHttpApi.traceAsync(contents: "OpenAsync url: " + self.url)
-                completion(resultAnalyzer.isStatusOk())
+        var userLoginStore = UserLoginStore(serverUrl: server, username: username, database: database)
+        
+        if (userLoginStore.IsAlreadyLogged()) {
+            let sessionId = userLoginStore.GetSessionId()
+            
+            let theUrl = server! + "/session/" + sessionId! + "/get_connection"
+            
+            callWithGetAsync(url: theUrl) {result, status in
+                if result == nil {
+                    completion(false)
+                } else {
+                    let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status!)
+                    
+                    if (!resultAnalyzer.isStatusOk())
+                    {
+                        AceQLException.ThrowException(type: 1, httpCode: status!.statusCode, httpStatus: resultAnalyzer.getErrorMessage(), description: "")
+                    }
+                    
+                    let theSessionId = resultAnalyzer.getValue(name: "session_id")
+                    self.url = self.server! + "/session/" + theSessionId! + "/"
+                    AceQLHttpApi.traceAsync(contents: "OpenAsync url: " + self.url)
+                    
+                    let connectionId = resultAnalyzer.getValue(name: "connection_id")
+                    self.url = self.server! + "/session/" + sessionId! + "/connection/" + connectionId! + "/"
+
+                    completion(resultAnalyzer.isStatusOk())
+                }
+            }
+        }
+        else{
+            theUrl = server! + "/database/" + database! + "/username/" + username!
+            theUrl = theUrl + "/login" + "?password=" + password!
+            ConsoleEmul.WriteLine(log: "theUrl: " + theUrl)
+            
+            callWithGetAsync(url: theUrl) {result, status in
+                if result == nil {
+                    completion(false)
+                } else {
+                    let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status!)
+                    
+                    if (!resultAnalyzer.isStatusOk())
+                    {
+                        AceQLException.ThrowException(type: 1, httpCode: status!.statusCode, httpStatus: resultAnalyzer.getErrorMessage(), description: "")
+                    }
+                    
+                    let theSessionId = resultAnalyzer.getValue(name: "session_id")
+                    let theConnectionId = resultAnalyzer.getValue(name: "connection_id")
+                    
+                    self.url = self.server! + "/session/" + theSessionId! + "/connection/" + theConnectionId! + "/"
+                    userLoginStore.SetSessionId(sessionId: theSessionId!)
+
+                    AceQLHttpApi.traceAsync(contents: "OpenAsync url: " + self.url)
+                    completion(resultAnalyzer.isStatusOk())
+                }
             }
         }
     }
@@ -202,11 +235,10 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         var theDatabase: String? = nil
         var theUsername: String? = nil
         var thePassword: String? = nil
-        var theStateless = false
         var theProxyUri: String? = nil
         
         var isNTLM = false
-        var theTimeout: Int = 0;
+        var theTimeout: Int = 0
         let lines = connectionString.split(separator: ";")
         
         var proxyUsername: String? = nil
@@ -217,15 +249,14 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         // If some empty ;
             if (line.trimmingCharacters(in: .whitespaces).count <= 2)
             {
-                continue;
+                continue
             }
             
             var theLines = line.split(separator: "=")
             
             if (theLines.count != 2)
             {
-                
-//            throw new ArgumentException("connectionString token does not contain a = separator: " + line);
+                AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "connectionString token does not contain a = separator: " + line)
             }
         
             let property = theLines[0].trimmingCharacters(in: .whitespaces)
@@ -233,31 +264,21 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             
             if (property.lowercased() == "server")
             {
-                theServer = value;
+                theServer = value
             }
             else if (property.lowercased() == "database")
             {
-                theDatabase = value;
+                theDatabase = value
             }
             else if (property.lowercased() == "username")
             {
                 value = value.replacingOccurrences(of: "\\semicolon", with: ";")
-                theUsername = value;
+                theUsername = value
             }
             else if (property.lowercased() == "password")
             {
                 value = value.replacingOccurrences(of: "\\semicolon", with: ";")
                 thePassword = value
-            }
-            else if (property.lowercased() == "stateless")
-            {
-                if (value.lowercased() == "true")
-                {
-                    theStateless = true
-                } else {
-                    theStateless = false
-                }
-                
             }
             else if (property.lowercased() == "ntlm")
             {
@@ -271,7 +292,7 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             }
             else if (property.lowercased() == "proxyuri")
             {
-                theProxyUri = value;
+                theProxyUri = value
                 // Set to null a "null" string
                 if (theProxyUri!.lowercased() == "null" || theProxyUri!.count == 0)
                 {
@@ -294,7 +315,7 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 else if (property.lowercased() == "proxypassword")
                 {
                     value = value.replacingOccurrences(of: "\\semicolon", with: ";")
-                    proxyPassword = value;
+                    proxyPassword = value
                 
                 // Set to null a "null" string
                 if (proxyPassword!.lowercased() == "null" || proxyPassword!.count == 0)
@@ -309,14 +330,14 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             }
         
         
-        debug(log: "connectionString   : " + connectionString);
+        debug(log: "connectionString   : " + connectionString)
         
         if (proxyUri != nil) {
-            debug(log: "theProxyUri        : " + String(describing: theProxyUri!));
+            debug(log: "theProxyUri        : " + String(describing: theProxyUri!))
         }
         
         if (proxyUsername != nil) {
-            debug(log: "theProxyCredentials: " + String(describing: proxyUsername!) + " / " + String(describing: proxyPassword!));
+            debug(log: "theProxyCredentials: " + String(describing: proxyUsername!) + " / " + String(describing: proxyPassword!))
         }
     
         theUsername = self.userName
@@ -324,16 +345,16 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
     //        if (isNTLM)
     //        {
-    //        theProxyCredentials = CredentialCache.DefaultCredentials;
+    //        theProxyCredentials = CredentialCache.DefaultCredentials
     //        }
     //        else
     //        {
     //        if (proxyUsername != null && proxyPassword != null)
     //        {
-    //        theProxyCredentials = new NetworkCredential(proxyUsername, proxyPassword);
+    //        theProxyCredentials = new NetworkCredential(proxyUsername, proxyPassword)
     //        }
         
-        initServer(server: theServer, database: theDatabase, username: theUsername, password: thePassword, stateless: theStateless, proxyUri: theProxyUri, timeout: theTimeout)
+        initServer(server: theServer, database: theDatabase, username: theUsername, password: thePassword, proxyUri: theProxyUri, timeout: theTimeout)
     
     }
     
@@ -344,7 +365,6 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// <param name="database">The database.</param>
     /// <param name="username">The username.</param>
     /// <param name="password">The password.</param>
-    /// <param name="stateless">The stateless.</param>
     /// <param name="proxyUri">The Proxy Uri.</param>
     /// <param name="proxyCredentials">The credentials.</param>
     /// <param name="timeout">The timeout.</param>
@@ -358,17 +378,10 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// database is null!
     /// </exception>
     
-    func initServer(server: String?, database:String?, username: String?, password: String?, stateless: Bool, proxyUri: String?, timeout: Int)
+    func initServer(server: String?, database:String?, username: String?, password: String?, proxyUri: String?, timeout: Int)
     {
         self.server = server
         self.database = database
-        
-//        if (username != null && password != null && credential == null)
-//        {
-//        this.credential = new AceQLCredential(username, password);
-//        }
-        
-        self.stateless = stateless
         self.proxyUri = proxyUri
         self.userName = username
         self.password = password
@@ -469,6 +482,8 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
                     print("statusCode should be 200, but is \(httpStatus.statusCode)")
                     print("response = \(String(describing: response))")
+                    AceQLException.ThrowException(type: 1, httpCode: httpStatus.statusCode, httpStatus: "", description: "")
+
                     completion(nil, response as? HTTPURLResponse)
                     return
                 }
@@ -523,6 +538,8 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
                 print("statusCode should be 200, but is \(httpStatus.statusCode)")
                 print("response = \(String(describing: response))")
+                AceQLException.ThrowException(type: 1, httpCode: httpStatus.statusCode, httpStatus: "", description: "")
+
                 completion(nil, response as? HTTPURLResponse)
                 return
             }
@@ -588,6 +605,8 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
                 print("statusCode should be 200, but is \(httpStatus.statusCode)")
                 print("response = \(String(describing: response))")
+                AceQLException.ThrowException(type: 1, httpCode: httpStatus.statusCode, httpStatus: "", description: "")
+
                 completion(nil, response as? HTTPURLResponse)
                 return
             }
@@ -623,10 +642,12 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     {
         callWithGetAsync(action: commandName, actionParameter: commandOption) { result, status in
             let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status)
-//                throw AceQLException(resultAnalyzer.getErrorMessage(),
-//                                         resultAnalyzer.getErrorId(),
-//                                         resultAnalyzer.getStackTrace(),
-//                                         status);
+            
+            if (!resultAnalyzer.isStatusOk())
+            {
+                AceQLException.ThrowException(type: 0, httpCode: resultAnalyzer.getErrorId(), httpStatus: "", description: resultAnalyzer.getErrorMessage())
+            }
+
             completion(resultAnalyzer.isStatusOk())
         }
     }
@@ -647,12 +668,9 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     {
         callWithGetAsync(action: commandName, actionParameter: commandOption) { result, status in
             let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status!)
-//            if (!resultAnalyzer.isStatusOk()) {
-    //            throw new AceQLException(resultAnalyzer.GetErrorMessage(),
-    //                                     resultAnalyzer.GetErrorId(),
-    //                                     resultAnalyzer.GetStackTrace(),
-    //                                     httpStatusCode);
-//            }
+            if (!resultAnalyzer.isStatusOk()) {
+                AceQLException.ThrowException(type: 0, httpCode: resultAnalyzer.getErrorId(), httpStatus: "", description: resultAnalyzer.getErrorMessage())
+            }
             
             completion(resultAnalyzer.GetResult(), resultAnalyzer.isStatusOk())
         }
@@ -744,12 +762,9 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
         callWithPostAsync(action: action, parameters: parametersMap) {result, status in
             let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status)
-//            if (!resultAnalyzer.isStatusOk()) {
-//                throw new AceQLException(resultAnalyzer.GetErrorMessage(),
-//                                         resultAnalyzer.GetErrorId(),
-//                                         resultAnalyzer.GetStackTrace(),
-//                                         httpStatusCode);
-//            }
+            if (!resultAnalyzer.isStatusOk()) {
+                AceQLException.ThrowException(type: 0, httpCode: resultAnalyzer.getErrorId(), httpStatus: "", description: resultAnalyzer.getErrorMessage())
+            }
             
             let rowCount = resultAnalyzer.GetIntvalue(name: "row_count")
             completion(rowCount, resultAnalyzer.isStatusOk())
@@ -776,14 +791,14 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     {
         if (blobId == nil)
         {
-//            throw new ArgumentNullException("blobId is null!");
+            AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "blobId is null")
             completion(nil)
             return;
         }
 
         if (stream == nil)
         {
-//            throw new ArgumentNullException("stream is null!");
+            AceQLException.ThrowException(type: 0, httpCode: 0, httpStatus: "", description: "stram is null")
             completion(nil)
             return;
         }
@@ -893,10 +908,7 @@ class AceQLHttpApi: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let resultAnalyzer = ResultAnalyzer(jsonResult: result, httpStatusCode: status!)
             if (!resultAnalyzer.isStatusOk())
             {
-//                throw new AceQLException(resultAnalyzer.GetErrorMessage(),
-//                                         resultAnalyzer.GetErrorId(),
-//                                         resultAnalyzer.GetStackTrace(),
-//                                         httpStatusCode);
+                AceQLException.ThrowException(type: 0, httpCode: resultAnalyzer.getErrorId(), httpStatus: "", description: resultAnalyzer.getErrorMessage())
             }
             
             let lengthStr = resultAnalyzer.getValue(name: "length");

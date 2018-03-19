@@ -125,7 +125,13 @@ class ResultAnalyzer {
             return 0
         }
     
-        return jsonResult!["error_type"] as! Int
+        let error_type = jsonResult!["error_type"]
+        if (error_type != nil)
+        {
+            return error_type as! Int
+        }
+        
+        return 0
     }
     
     /// <summary>
@@ -145,7 +151,13 @@ class ResultAnalyzer {
             return theErrorMessage;
         }
         
-        return jsonResult!["error_message"] as! String
+        let error_message = jsonResult!["error_message"]
+        if (error_message != nil)
+        {
+            return error_message as! String
+        }
+        
+        return ""
     }
     
     /// <summary>

@@ -8,9 +8,54 @@
 
 import Foundation
 
-enum AceQLException: String, Error {
-    case missedServer = "Server keyword not found in connection string."
-    case missedUsername = "Username keyword not found in connection string or AceQLCredential not set."
-    case missedPassword = "Password keyword not found in connection string or AceQLCredential not set"
-    case missedDatabase = "Database keyword not found in connection string."
+public class AceQLException: Error {
+    /// <summary>
+    /// The HTTP status code.
+    /// </summary>
+    var httpStatusCode: Int = 0
+    
+    /// <summary>
+    /// The reason.
+    /// </summary>
+    var reason: String = ""
+    
+    /// <summary>
+    /// The error type.
+    /// </summary>
+    var errorType: Int = 0
+    
+    /// <summary>
+    /// The remote stack trace.
+    /// </summary>
+    var remoteStackTrace: String = ""
+
+    static var Instance: AceQLException? = nil
+    
+    init()
+    {
+        
+    }
+    
+    static func ThrowException(type: Int, httpCode: Int, httpStatus: String, description: String)
+    {
+        if (Instance == nil)
+        {
+            Instance = AceQLException()
+        }
+        
+        Instance?.httpStatusCode = httpCode
+        Instance?.remoteStackTrace = httpStatus
+        Instance?.errorType = type
+        Instance?.reason = description
+    }
+    
+    static func GetLastError() -> AceQLException?
+    {
+        if (Instance == nil)
+        {
+            Instance = AceQLException()
+        }
+        
+        return Instance
+    }
 }
