@@ -1,4 +1,4 @@
-# AceQL HTTP 1.0 - Swift Client SDK
+# AceQL HTTP - Swift Client SDK v2.0 
 
 <img src="https://www.aceql.com/favicon.png" alt=""/>
 
@@ -30,9 +30,9 @@
 
 This document describes how to use the  AceQL Swift Client SDK  and gives some details about how it operates with the AceQL Server side.
 
-The Swift  SDK  allows you to wrap the [AceQL HTTP APIs](https://github.com/kawansoft/aceql-http/blob/master/aceql-http-1.0-user-guide-api.md)  to access remote SQL databases and/or SQL databases in the cloud by simply including standard SQL calls in your code, just like you would do for any local database. There is zero learning curve and usage is straightforward.
+The Swift  SDK  allows you to wrap the [AceQL HTTP APIs](https://github.com/kawansoft/aceql-http/blob/master/aceql-http-2.1-user-guide-api.md)  to access remote SQL databases and/or SQL databases in the cloud by simply including standard SQL calls in your code, just like you would do for any local database. There is zero learning curve and usage is straightforward.
 
-The AceQL Server operation is described in [AceQL HTTP Server Installation and Configuration Guide](https://github.com/kawansoft/aceql-http/blob/master/aceql-http-1.0-user-guide-server.md), whose content is sometimes referred to in his User Guide.
+The AceQL Server operation is described in [AceQL HTTP Server Installation and Configuration Guide](https://github.com/kawansoft/aceql-http/blob/master/aceql-http-2.1-user-guide-server.md), whose content is sometimes referred to in his User Guide.
 
 On the remote side, like the AceQL Server access to the SQL database using Java JDBC, we will sometimes use the JDBC terminology (ResultSet, etc.) in this document. Nevertheless, knowledge of Java or JDBC is *not* a requirement.
 
@@ -44,7 +44,7 @@ On the remote side, like the AceQL Server access to the SQL database using Java 
 
 ## AceQL Server side compatibility
 
-This 1.0 SDK version is compatible with both AceQL HTTP server side v1.0 and AceQL HTTP server side v2.0. 
+The SDK v2.1 version is compatible with AceQL HTTP v2.0+ server version. It does not support previous version AceQL HTTP v1.0.
 
 ## Installation
 
@@ -125,7 +125,7 @@ connection = AceQLConnection(server: serverUrl, database: database, username: us
 connection.openAsync() { status in }
 ```
 
-The schema of the database is here:  [kawansoft_example](https://www.aceql.com/rest/soft/1.0/src/kawansoft_example_other_databases.txt)
+The schema of the database is here:  [kawansoft_example](https://www.aceql.com/rest/soft/2.1/src/kawansoft_example_other_databases.txt)
 
 Following sample shows how to insert a new customers using a  prepared statements
 
@@ -333,31 +333,4 @@ self.connection.run(sql: sql) { stmt in
 ```
 
 ------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
