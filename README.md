@@ -1,4 +1,6 @@
-# AceQL HTTP - Swift Client SDK v2.0 
+# AceQL HTTP 
+
+## Swift Client SDK v2.0 - January 12, 2018
 
 <img src="https://www.aceql.com/favicon.png" alt=""/>
 
@@ -333,4 +335,3 @@ self.connection.run(sql: sql) { stmt in
 ```
 
 ------
-
